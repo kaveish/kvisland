@@ -1175,8 +1175,8 @@ void main(){vec3 p=aP,N=aN;p.y*=uRise;gl_Position=uM*vec4(p,1.);vP=p;vN=N;${PLV}
 vS=(uSM*vec4(p+N*.07,1.)).xyz*.5+.5;${FOGV}}`,
 PREC+`varying vec3 vP,vN,vS,vPL;varying float vFog;
 uniform sampler2D uT,uSp,uD,uNz;uniform float uTime;uniform vec3 uFog,uSunDir,uSun,uAmb,uGnd;${SHF}
-void main(){vec2 uv=vP.xz/64.,q=vP.xz*.5;
-vec4 m=texture2D(uT,uv),sp=texture2D(uSp,uv),d1=texture2D(uD,q),d2=texture2D(uD,q*.23+.37),d3=texture2D(uD,q+uSunDir.xz*.008);
+void main(){vec2 uv=vP.xz/64.,q=vP.xz*.7;
+vec4 m=texture2D(uT,uv),sp=texture2D(uSp,uv),d1=texture2D(uD,q),d2=texture2D(uD,q*.19+.37),d3=texture2D(uD,q+uSunDir.xz*.008);
 vec4 w=vec4(max(1.-sp.r-sp.g-sp.b,0.),sp.rgb),hh=w+(d1*.65+d2*.35)*.5*step(.004,w);
 float ma=max(max(hh.x,hh.y),max(hh.z,hh.w))-.14;
 vec4 b=max(hh-ma,0.);b/=b.x+b.y+b.z+b.w;
@@ -1423,6 +1423,7 @@ function crown(cx,cy,cz,rx,ry,rz,n,cA,cB,r){
 function blade(x,z,an,lean,h,w,c0,c1){
   const dx=Math.cos(an),dz=Math.sin(an),sx=-dz*w,sz=dx*w,mx=x+dx*lean*.35,mz=z+dz*lean*.35,hm=h*.55,nx=dx*.35,nz=dz*.35;
   const A=()=>rgb(c0[0],c0[1],c0[2]),M=()=>rgb((c0[0]+c1[0])/2,(c0[1]+c1[1])/2,(c0[2]+c1[2])/2);
+  if(!LD){A();V(x-sx,0,z-sz,nx,1,nz);V(x+sx,0,z+sz,nx,1,nz);rgb(c1[0],c1[1],c1[2]);V(x+dx*lean,h,z+dz*lean,nx,1,nz);return;}   // from afar one triangle will do
   A();V(x-sx,0,z-sz,nx,1,nz);V(x+sx,0,z+sz,nx,1,nz);M();V(mx-sx*.7,hm,mz-sz*.7,nx,1,nz);
   A();V(x+sx,0,z+sz,nx,1,nz);M();V(mx+sx*.7,hm,mz+sz*.7,nx,1,nz);V(mx-sx*.7,hm,mz-sz*.7,nx,1,nz);
   V(mx-sx*.7,hm,mz-sz*.7,nx,1,nz);V(mx+sx*.7,hm,mz+sz*.7,nx,1,nz);rgb(c1[0],c1[1],c1[2]);V(x+dx*lean,h,z+dz*lean,nx,1,nz);
@@ -1527,7 +1528,7 @@ function mkStalks(ears){
   for(let k=0;k<n;k++){const a=r()*6.283,d=r()*.14,x=Math.cos(a)*d,z=Math.sin(a)*d,la=r()*6.283,lean=.06+r()*.14,h=.85+r()*.3;
     blade(x,z,la,lean,h,.05,[.66,.66,.66],[1.02,1.02,1.02]);
     if(ears){const ex=x+Math.cos(la)*lean,ez=z+Math.sin(la)*lean;rgb(1.12,1.04,.72);
-      for(const [px,pz] of [[.045,0],[-.045,0],[0,.045],[0,-.045]]){tri(ex,h-.06,ez,ex+px,h+.1,ez+pz,ex+pz,h+.1,ez-px,ex,h+.1,ez);tri(ex,h+.3,ez,ex+px,h+.1,ez+pz,ex+pz,h+.1,ez-px,ex,h+.1,ez);}}
+      for(const [px,pz] of [[.05,0],[0,.05]]){tri(ex,h-.06,ez,ex+px,h+.1,ez+pz,ex-px,h+.1,ez-pz,ex,h+.1,ez+9);tri(ex,h+.3,ez,ex+px,h+.1,ez+pz,ex-px,h+.1,ez-pz,ex,h+.1,ez+9);}}
   }
   SW=0;
 }
@@ -1558,7 +1559,7 @@ function initProtos(){
   def('fstem',.2,0,mkFlowerStem,1);def('fhead',.2,0,mkFlowerHead,1);
   def('stalks',.5,1,()=>mkStalks(0));def('wheat',.5,1,()=>mkStalks(1));
   def('grave',.5,1,mkGrave);def('pebbles',.2,0,mkPebbles,1);
-  def('tuft0',.3,0,()=>mkTuft(1,8,.07),1).near=true;def('tuft1',.3,0,()=>mkTuft(2,13,.17),1).near=true;def('tuft2',.3,0,()=>mkTuft(3,5,.04),1).near=true;
+  def('tuft0',.3,0,()=>mkTuft(1,8,.07)).near=true;def('tuft1',.3,0,()=>mkTuft(2,13,.17)).near=true;def('tuft2',.3,0,()=>mkTuft(3,5,.04)).near=true;
 }
 // what stands on a tile becomes a few instances of the models above
 function objInst(x,z,i){
@@ -1584,7 +1585,7 @@ function objInst(x,z,i){
     const s=.07+.36*g,ripe=g>=1,p=ripe?PR.wheat:PR.stalks;let r,gg,b=.28;
     if(g<.5){r=lerp(.45,.36,g*2);gg=lerp(.66,.72,g*2);}else{r=lerp(.36,.92,(g-.5)*2);gg=lerp(.72,.76,(g-.5)*2);}
     for(let rw=0;rw<3;rw++)for(let k=0;k<5;k++){const fx=x+.14+k*.18+(h2(x*7+k,z*3+rw)-.5)*.08,fz=z+.2+rw*.3+(h2(x+k*5,z*9+rw)-.5)*.06;
-      p.add(fx,gy(fx,fz)+.05,fz,s*(.85+h2(x+k,z+rw*3)*.3),h2(k,rw+x+z)*6.283,r,gg,b);}
+      p.add(fx,gy(fx,fz)+.06,fz,s*(.85+h2(x+k,z+rw*3)*.3),h2(k,rw+x+z)*6.283,r,gg,b);}
   }
   else if(o===O_GRAVE){const y=gy(x+.5,z+.5);PR.grave.add(x+.5,y,z+.5,clamp(g*3,.2,1),0,1,1,1);}
 }
@@ -1596,18 +1597,29 @@ function clutter(x,z,i){
   if(t===2)return;
   if(G.bld[i]||h<SAND+.012)return;
   const w=G.wear[i],o=G.obj[i];if(w>.5||o===O_CROP||o===O_GRAVE)return;
-  const n=o?3:w>.2?2:5+(G.moist[i]>.6?1:0);
+  const n=o?2:w>.2?2:4+(G.moist[i]>.6?1:0);
   for(let k=0;k<n;k++){
     const px=x+h2(x*7+k*13,z*3+1),pz=z+h2(x*5+3,z*11+k*7),hv=h2(x+k*31,z*19+k),hp=hs(px,pz);if(hp<SAND+.012||hp>ROCK)continue;
     grassTint(hp,samp(G.moist,px,pz));const q=(1.02+hv*.2)/255;
     (hv<.5?PR.tuft0:hv<.8?PR.tuft1:PR.tuft2).add(px,elev(hp),pz,.5+h2(x*3+k,z*5)*.62,hv*40,GT[0]*q,GT[1]*q*1.03,GT[2]*q);
   }
 }
-function fence(P,gate){   // posts on the ground wherever it happens to be, joined by two rails
+function fence(P,by){   // posts on the ground wherever it happens to be, joined by two rails
   mat(M_WOOD,3);col('#b89466');let px=0,py=0,pz=0;
-  for(let k=0;k<P.length;k++){const x=P[k][0],z=P[k][1],y=gy(x,z);T(x,y,z,k,1);box(0,.17,0,.07,.42,.07);T(0,0,0,0,1);
-    if(k>0&&k!==gate){beam(px,py+.3,pz,x,y+.3,z,.035,.05);beam(px,py+.16,pz,x,y+.16,z,.035,.05);}
+  for(let k=0;k<P.length;k++){const x=P[k][0],z=P[k][1],y=gy(x,z);T(x,y,z,k,1);box(0,.17,0,.07,.42,.07);T(0,by,0,0,1);
+    if(k>0){beam(px,py-by+.3,pz,x,y-by+.3,z,.035,.05);beam(px,py-by+.16,pz,x,y-by+.16,z,.035,.05);}
     px=x;py=y;pz=z;}
+}
+// a bed of soil laid over the ground, following every dip and rise, with a rim down to the turf
+function drape(x0,z0,x1,z1,n,lift,by){
+  const m=n+1,Y=[],dx=(x1-x0)/n,dz=(z1-z0)/n;T(0,by,0,0,1);
+  for(let j=0;j<m;j++)for(let i=0;i<m;i++)Y.push(gy(x0+i*dx,z0+j*dz)+lift-by);
+  const E=(i,j)=>{const k=j*m+i;V(x0+i*dx,Y[k],z0+j*dz,(Y[i>0?k-1:k]-Y[i<n?k+1:k])/dx*.5,1,(Y[j>0?k-m:k]-Y[j<n?k+m:k])/dz*.5);};
+  for(let j=0;j<n;j++)for(let i=0;i<n;i++){E(i,j);E(i,j+1);E(i+1,j+1);E(i,j);E(i+1,j+1);E(i+1,j);}
+  for(let i=0;i<n;i++){
+    for(const [j,nz] of [[0,-1],[n,1]]){const xa=x0+i*dx,xb=xa+dx,z=z0+j*dz,ya=Y[j*m+i],yb=Y[j*m+i+1];Q(xa,ya-.16,z,xb,yb-.16,z,xb,yb,z,xa,ya,z,0,0,nz);}
+    for(const [ii,nx] of [[0,-1],[n,1]]){const za=z0+i*dz,zb=za+dz,x=x0+ii*dx,ya=Y[i*m+ii],yb=Y[(i+1)*m+ii];Q(x,ya-.16,za,x,yb-.16,zb,x,yb,zb,x,ya,za,nx,0,0);}
+  }
 }
 function barrel(x,y,z,r,h){
   mat(M_WOOD,5);col('#9a6a3a');lathe(x,y,z,[[r*.82,0],[r,h*.3],[r,h*.7],[r*.82,h],[0,h]],9,1);
@@ -1617,10 +1629,9 @@ function bldMesh(b,night){
   const d=BD[b.type],cx=b.x+d.w/2,cz=b.y+d.h/2,by=gy(cx,cz);
   if(b.type==='farm'){
     const p=b.done?1:b.prog/d.work;
-    mat(M_SOIL,2);col(b.done?'#8a6646':'#a88a64');
-    for(let dz=0;dz<3;dz++)for(let dx=0;dx<3;dx++){const x=b.x+dx+.5,z=b.y+dz+.5;T(x,gy(x,z),z,0,1);box(0,.03,0,p,.1,p);}
-    T(0,0,0,0,1);
-    if(b.done)fence([[-.55,1.5],[-1.5,1.5],[-1.5,0],[-1.5,-1.5],[0,-1.5],[1.5,-1.5],[1.5,0],[1.5,1.5],[.55,1.5]].map(q=>[cx+q[0],cz+q[1]]),-1);
+    mat(M_SOIL,2);col(b.done?'#8a6646':'#a88a64');const e=1.46*Math.max(p,.08);
+    drape(cx-e,cz-e,cx+e,cz+e,b.done?9:5,.06,by);
+    if(b.done)fence([[-.55,1.5],[-1.5,1.5],[-1.5,0],[-1.5,-1.5],[0,-1.5],[1.5,-1.5],[1.5,0],[1.5,1.5],[.55,1.5]].map(q=>[cx+q[0],cz+q[1]]),by);
     else{mat(M_WOOD,3);col('#c9a56e');for(const [fx,fz] of [[-1.5,-1.5],[1.5,-1.5],[-1.5,1.5],[1.5,1.5]]){T(cx+fx,gy(cx+fx,cz+fz),cz+fz,0,1);box(0,.15,0,.08,.42,.08);}}
     return;
   }
@@ -1712,7 +1723,7 @@ function bldMesh(b,night){
       col(WOOD2);box(0,.5,-.1,.76,.04,.66);
       mat(M_THATCH,2.5);col('#d9a444');roof(0,.52,-.1,.8,.72,.32,.04);
       mat(M_WOOD,4);col(WOOD2);box(0,.26,.16,.16,.2,.04);mat(M_WOOD,3);col('#c9a56e');beam(0,.14,.17,0,.02,.44,.12,.02);
-      T(0,0,0,0,1);fence([[-.7,.2],[-.7,1.1],[0,1.1],[.7,1.1],[.7,.2]].map(q=>[cx+q[0],cz+q[1]]),-1);T(cx,by,cz,0,1);
+      fence([[-.7,.2],[-.7,1.1],[0,1.1],[.7,1.1],[.7,.2]].map(q=>[cx+q[0],cz+q[1]]),by);T(cx,by,cz,0,1);
       mat(M_FLAT);col('#fff8e0');for(let k=0;k<Math.min(4,b.eggs|0);k++)blob(-.2+k*.13,.06,.5,.045,.06,.045,1,0);break;}
     case 'shrine':{
       mat(M_STONE,1.6);col('#c4bfb1');lathe(0,0,0,[[.94,-.15],[.94,.08],[.9,.1],[.62,.1],[.62,.17],[.58,.19],[0,.19]],18,0);
@@ -1777,6 +1788,14 @@ function villMesh(v,dt){
       col('#1c1410');blob(-.05,hy,.112,.017,.02,.012,0,0);blob(.05,hy,.112,.017,.02,.012,0,0);col(sk);blob(0,hy-.03,.123,.018,.018,.016,0,0);}
   }
 }
+// a tongue of fire: pale yellow at the root, deepening to red at a tip that wavers
+function flame(x,z,r,h,ph,core){
+  const n=6,m=5,hh=h*(1+.12*Math.sin(now*13+ph));
+  const ring=(t,k)=>{const w=now*8+ph+t*4,a=k/n*6.2832,rr=r*Math.pow(1-t,.7)*(1+.9*t*(1-t));
+    rgb(1,core?lerp(.95,.55,t):lerp(.74,.3,t),core?lerp(.62,.12,t):lerp(.22,.06,t));
+    V(x+Math.sin(w)*.06*t+Math.cos(a)*rr,.06+hh*t,z+Math.cos(w*.8)*.06*t+Math.sin(a)*rr,0,0,0);};
+  for(let i=0;i<m;i++)for(let k=0;k<n;k++){const t0=i/m,t1=(i+1)/m;ring(t0,k);ring(t0,k+1);ring(t1,k+1);ring(t0,k);ring(t1,k+1);ring(t1,k);}
+}
 function disc2(x,y,z,r,s){for(let k=0;k<6;k++){const a0=k/6*6.2832,a1=(k+1)/6*6.2832;V(x,y,z,s,0,0);V(x,y+Math.cos(a0)*r,z+Math.sin(a0)*r,s,0,0);V(x,y+Math.cos(a1)*r,z+Math.sin(a1)*r,s,0,0);}}
 function animalMesh(a,dt){
   const y=gy(a.x,a.y),bob=a.mv?Math.abs(Math.sin(now*9+a.x))*.03:0,ra=turn(a,dt),hi=LD,sub=hi?1:0,sw=a.mv?Math.sin(now*9+a.x)*.04:0;
@@ -1796,9 +1815,8 @@ function buildDynamic(dark,dt){
   for(const a of G.animals){const dx=a.x-R.cullX,dz=a.y-R.cullZ;if(dx*dx+dz*dz<cr2)animalMesh(a,dt);else turn(a,dt);}
   for(const b of G.buildings){
     if(!b.done){bldMesh(b,false);continue;}
-    if(b.type==='fire'){const y=gy(b.x+.5,b.y+.5),f=Math.sin(now*11+b.v),f2=Math.sin(now*7.3+b.v);UN=true;mat(M_FLAT);
-      T(b.x+.5,y,b.y+.5,now*2,1);col('#f07a2c');cone(0,.08,0,.18+f2*.015,.5+f*.07,7);
-      T(b.x+.5,y,b.y+.5,-now*3,1);col('#ffb347');cone(.02,.08,0,.12,.38-f*.05,6);col('#ffe48a');cone(0,.08,.01,.07,.24+f2*.04,5);
+    if(b.type==='fire'){const y=gy(b.x+.5,b.y+.5);UN=true;mat(M_FLAT);T(b.x+.5,y,b.y+.5,0,1);
+      flame(0,0,.13,.5,b.v,1);for(let k=0;k<5;k++){const a=k*1.257+b.v;flame(Math.cos(a)*.09,Math.sin(a)*.09,.085,.3+.1*Math.sin(now*5+k*2.1+b.v),b.v+k*1.7,0);}
       if(dark>.3){T(b.x+.5,y,b.y+.5,0,1);rgb(1,.72,.3);for(let k=0;k<4;k++){const t=(now*.45+k*.25+b.v*.13)%1,s=.035*(1-t);
         box(Math.sin(t*7+k*2)*.14,.4+t*1.3,Math.cos(t*5+k)*.14,s,s,s);}}
       UN=false;}
@@ -1921,7 +1939,7 @@ function render(real){
   R.meshT-=real;if(R.meshNow||R.meshT<=0||night!==R.night){R.meshNow=false;R.meshT=3;R.night=night;buildStatic(night);}
   buildDynamic(dark,real);
   // from far off the plain models stand in, and the grass tufts shrink away into the ground texture
-  const lo=view.d>36||QL>=2,tuftK=QL>=2||!INST?0:clamp((50-view.d)/14,0,1);
+  const lo=view.d>32||QL>=2,tuftK=QL>=2||!INST?0:clamp((40-view.d)/12,0,1);
   for(const p of PLIST){if(p.near&&tuftK<=0)p.nv=0;else p.cull(ccx,ccz,R.cullR);}
   if(R.rise<1)R.rise=Math.min(1,R.rise+real*.75);
   const rt=R.rise-1,rise=R.rise>=1?1:1+2.2*rt*rt*rt+1.2*rt*rt;
@@ -1955,7 +1973,7 @@ function render(real){
     gl.bindTexture(gl.TEXTURE_2D,MTEX[m]);gl.uniform1f(P.u.uCut,MCUT[m]);gl.uniform1f(P.u.uWrap,MWRAP[m]);
     const a=SO.b[m],b=DO.b[m];if(a)a.draw();if(b)b.draw();
     for(const p of PLIST){if(!p.nv||(casting&&!p.cast))continue;
-      if(p.near){gl.uniform1f(P.u.uIS,tuftK);p.draw(m,lo);gl.uniform1f(P.u.uIS,1);}else p.draw(m,lo);}}};
+      if(p.near){gl.uniform1f(P.u.uIS,tuftK);p.draw(m,view.d>17);gl.uniform1f(P.u.uIS,1);}else p.draw(m,lo||casting);}}};   // shadows come from the plain models
   // shadow pass: the scene seen from the sun, fitted around what the camera can see
   let bias=0;
   gl.activeTexture(gl.TEXTURE0);
