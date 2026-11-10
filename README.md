@@ -56,9 +56,11 @@ The island saves itself to the browser's local storage every few seconds and whe
 
 Everything lives in `index.html`: plain JavaScript and WebGL, with no dependencies.
 
-- **Terrain** is a 64×64 height map drawn as a lit mesh with a painted texture. Trees, buildings and villagers are low-poly shapes built in code.
-- **Light** comes from a sun with a shadow map, fitted each frame around what the camera can see, plus soft sky light, firelight at night and a little distance haze.
-- **Water** is one shader: it reads the height map to find the shore, where it draws foam lines that roll in, and scatters drifting highlights further out.
+- **Terrain** is a 64×64 height map, smoothed into rolling slopes. A painted colour map gives the broad picture: grass that greens with moisture, beaches, bare banks, worn footpaths. A tiling grain map, read at two scales, gives each surface its close-up texture of grass blades, sand, rock or earth, and the grain decides where one surface gives way to the next, so borders are ragged. Tufts of grass and scattered pebbles stand on top.
+- **Textures** are all painted in code when the game starts: bark, leaf clumps, pine boughs, palm fronds, planks, plaster, roof tiles, stone, thatch, wool and soil. There are no image files.
+- **Models** are built in code from smooth shapes: lathed and tubular forms, rounded lumps, and crowns made of many leaf cards. Trees, bushes, rocks, flowers, crops and grass are each modelled once, in a detailed and a plain version, and drawn many times over with instancing. The plain versions take over when the camera pulls back.
+- **Light** is worked out per pixel: a sun with a shadow map, fitted each frame around what the camera can see, sky light from above and warmer light bounced up from the ground, firelight at night and a little distance haze.
+- **Water** is one shader. It reads the height map to find the shore and the depth, so the shallows are clear and the open sea deep blue. Three layers of ripples catch the sky and glitter in the sun, foam laps up the beach and slides back, surf lines roll in, cloud and tree shadows fall across the surface, and sunlight throws a moving net of light on the sea bed.
 - **Interface** is HTML over the canvas: inked paper tiles and a set of about seventy SVG icons defined in the script.
 - **Villagers** find their way with a breadth-first search over walkable tiles.
-- **Frame rate:** if a device cannot hold 30 frames a second, the game lowers its render resolution, and as a last step swaps the shadow map for simple blob shadows. Add `#hq` to the address to keep full quality.
+- **Frame rate:** if a device cannot hold 30 frames a second, the game lowers its render resolution, then swaps to the plain models and drops the grass tufts, and as a last step replaces the shadow map with simple blob shadows. Add `#hq` to the address to keep full quality.
