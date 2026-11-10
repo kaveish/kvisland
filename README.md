@@ -2,7 +2,7 @@
 
 A small god game in one HTML file. You watch over a procedurally generated island from above while a village grows across it. The villagers run their own lives; you nudge the world to help them.
 
-**Play:** open `index.html` in any modern browser, on a phone or a desktop. There is nothing to install or build, and no network access is needed. If GitHub Pages is enabled for this repository, the game is served from the repository root.
+**Play:** https://kaveish.github.io/kvisland/ (GitHub Pages serves `index.html` from the root of `main`). You can also open `index.html` straight from disk in any modern browser, on a phone or a desktop. There is nothing to install or build.
 
 ## What happens on the island
 
