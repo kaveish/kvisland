@@ -470,7 +470,7 @@ function die(v,why){
 }
 function updV(v,dt){
   v.age+=dt/DAY;v.hunger-=dt/(1.25*DAY);
-  if(v.hunger<=0){v.hunger=0;v.health-=dt/(.9*DAY);if(v.health<=0)return die(v,'hunger');}
+  if(v.hunger<=0){v.hunger=0;v.health-=dt/(1.6*DAY);if(v.health<=0)return die(v,'hunger');}
   else if(v.health<1)v.health=Math.min(1,v.health+dt/DAY);
   if(v.bub){v.bub.t-=dt;if(v.bub.t<=0)v.bub=null;}
   if(v.look>0)v.look-=dt;if(v.awe>0)v.awe-=dt;
